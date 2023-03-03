@@ -413,6 +413,7 @@ class CallkitNotificationManager(private val context: Context) {
                     getFlagPendingIntent()
             )
         } else {
+            addCall(context, Data.fromBundle(data), true)
             val acceptIntent = CallkitIncomingBroadcastReceiver.getIntentAccept(context, data)
             return PendingIntent.getBroadcast(
                     context,

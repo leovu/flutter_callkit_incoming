@@ -59,7 +59,8 @@ class TransparentActivity : Activity() {
                 sendBroadcast(acceptIntent)
             }
             else -> { // Note the block
-                val data = intent.getBundleExtra("data")
+                val data = intent.getBundleExtra("data") ?: return
+                addCall(this, Data.fromBundle(data), true)
                 val acceptIntent = CallkitIncomingBroadcastReceiver.getIntentAccept(this@TransparentActivity, data)
                 sendBroadcast(acceptIntent)
             }
