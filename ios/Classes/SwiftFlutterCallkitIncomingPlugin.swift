@@ -382,8 +382,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             self.configurAudioSession()
         }
         self.answerCall = call
-        let json: [String: Any?] = self.data?.toJSON()
-        json["isAccepted"] = true
+        var json: [String: Any?]? = self.data?.toJSON()
+        json?["isAccepted"] = true
         sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, json)
         action.fulfill()
     }
