@@ -26,6 +26,7 @@ class FlutterCallkitIncoming {
   /// Event.ACTION_CALL_ENDED - Ended an incoming/outgoing call
   /// Event.ACTION_CALL_TIMEOUT - Missed an incoming call
   /// Event.ACTION_CALL_CALLBACK - only Android (click action `Call back` from missed call notification)
+  /// Event.ACTION_CALL_CLEAR - Clear all call
   /// Event.ACTION_CALL_TOGGLE_HOLD - only iOS
   /// Event.ACTION_CALL_TOGGLE_MUTE - only iOS
   /// Event.ACTION_CALL_TOGGLE_DMTF - only iOS
@@ -79,6 +80,11 @@ class FlutterCallkitIncoming {
   /// On Android: return Empty
   static Future getDevicePushTokenVoIP() async {
     return await _channel.invokeMethod("getDevicePushTokenVoIP");
+  }
+
+  /// Clear all call and notification call
+  static Future clearCall() async {
+    return await _channel.invokeMethod("clearCall");
   }
 
   static Future checkCallAccepted() async {

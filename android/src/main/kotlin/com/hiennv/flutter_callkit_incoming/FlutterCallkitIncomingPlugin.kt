@@ -206,6 +206,19 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                 "getDevicePushTokenVoIP" -> {
                     result.success("")
                 }
+                "clearCall" -> {
+                    val calls = getDataActiveCalls(context)
+                    calls.forEach {
+                        context?.sendBroadcast(
+                            CallkitIncomingBroadcastReceiver.getIntentClear(
+                                requireNotNull(context),
+                                it.toBundle()
+                            )
+                        )
+                    }
+                    removeAllCalls(context)
+                    result.success("OK")
+                }
             }
         } catch (error: Exception) {
             result.error("error", error.message, "")

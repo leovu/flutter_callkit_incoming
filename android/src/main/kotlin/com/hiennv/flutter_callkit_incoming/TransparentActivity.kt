@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import java.util.*
 
 class TransparentActivity : Activity() {
@@ -44,7 +43,8 @@ class TransparentActivity : Activity() {
         super.onCreate(savedInstanceState)
         when (intent.getStringExtra("type")) {
             "ACCEPT" -> {
-                val data = intent.getBundleExtra("data")
+                val data = intent.getBundleExtra("data") ?: return
+                addCall(this, Data.fromBundle(data), true)
                 val acceptIntent = CallkitIncomingBroadcastReceiver.getIntentAccept(this@TransparentActivity, data)
                 sendBroadcast(acceptIntent)
                 if(isTaskRoot) {
@@ -59,7 +59,8 @@ class TransparentActivity : Activity() {
                 sendBroadcast(acceptIntent)
             }
             else -> { // Note the block
-                val data = intent.getBundleExtra("data")
+                val data = intent.getBundleExtra("data") ?: return
+                addCall(this, Data.fromBundle(data), true)
                 val acceptIntent = CallkitIncomingBroadcastReceiver.getIntentAccept(this@TransparentActivity, data)
                 sendBroadcast(acceptIntent)
             }
