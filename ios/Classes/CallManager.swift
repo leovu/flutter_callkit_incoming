@@ -65,10 +65,13 @@ class CallManager: NSObject {
         for call in calls {
             let callItem = self.callWithUUID(uuid: call.uuid)
             if(callItem != nil){
-                let item: [String: Any?] = callItem!.data.toJSON()
+                var item: [String: Any?] = callItem!.data.toJSON()
+                if call.hasConnected {
+                    item["isAccepted"] = call.hasConnected
+                }
                 json.append(item)
             }else {
-                let item: [String: String] = ["id": call.uuid.uuidString]
+                var item: [String: String] = ["id": call.uuid.uuidString]
                 json.append(item)
             }
         }
