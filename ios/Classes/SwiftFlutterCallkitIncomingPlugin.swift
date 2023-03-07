@@ -37,6 +37,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     private var isFromPushKit: Bool = false
     private let devicePushTokenVoIP = "DevicePushTokenVoIP"
     
+    private var isAcceptedCallKitData: Data?
+    
     private func sendEvent(_ event: String, _ body: [String : Any?]?) {
         eventCallbackHandler?.send(event, body ?? [:] as [String : Any?])
     }
@@ -115,6 +117,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         case "getDevicePushTokenVoIP":
             result(self.getDevicePushTokenVoIP())
             break;
+        case "checkCallAccepted":
+            result(self.checkCallAccepted())
+            break;
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -127,6 +132,15 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     @objc public func getDevicePushTokenVoIP() -> String {
         return UserDefaults.standard.string(forKey: devicePushTokenVoIP) ?? ""
+    }
+    
+    public func checkCallAccepted() -> [String: Any?]? {
+        if(isAcceptedCallKitData != nil) {
+            var data:[String: Any?] = isAcceptedCallKitData!.toJSON()
+            isAcceptedCallKitData = nil
+            return data
+        }
+        return nil
     }
     
     @objc public func showCallkitIncoming(_ data: Data, fromPushKit: Bool) {
@@ -381,8 +395,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
             self.configurAudioSession()
         }
         self.answerCall = call
+        self.isAcceptedCallKitData = self.data
         sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
-//        UserDefaults.standard.set(true, forKey: "flutter.isAcceptCall")
         action.fulfill()
     }
     
