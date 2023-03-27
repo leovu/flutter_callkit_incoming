@@ -21,8 +21,6 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     static let ACTION_CALL_TOGGLE_GROUP = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_GROUP"
     static let ACTION_CALL_TOGGLE_AUDIO_SESSION = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_AUDIO_SESSION"
     
-    static let ACTION_CALL_LOCKSCREEN = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_LOCKSCREEN"
-    
     @objc public static var sharedInstance: SwiftFlutterCallkitIncomingPlugin? = nil
     
     private var channel: FlutterMethodChannel? = nil
@@ -389,10 +387,9 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 self.configurAudioSession()
             }
             self.answerCall = call
+            var json:[String: Any?]? = self.data?.toJSON()
+            json?["isLockScreen"] = isLockScreen
             sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
-            if(isLockScreen) {
-                sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_LOCKSCREEN, self.data?.toJSON())
-            }
             action.fulfill()
         }
         else {
