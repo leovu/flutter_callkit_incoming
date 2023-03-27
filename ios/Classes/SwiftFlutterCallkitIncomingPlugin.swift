@@ -21,6 +21,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     static let ACTION_CALL_TOGGLE_GROUP = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_GROUP"
     static let ACTION_CALL_TOGGLE_AUDIO_SESSION = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_TOGGLE_AUDIO_SESSION"
     
+    static let ACTION_CALL_LOCKSCREEN = "com.hiennv.flutter_callkit_incoming.ACTION_CALL_LOCKSCREEN"
+    
     @objc public static var sharedInstance: SwiftFlutterCallkitIncomingPlugin? = nil
     
     private var channel: FlutterMethodChannel? = nil
@@ -374,18 +376,35 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     public func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
-        guard let call = self.callManager?.callWithUUID(uuid: action.callUUID) else{
-            action.fail()
-            return
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1200)) {
-            self.configurAudioSession()
-        }
-        self.answerCall = call
-        sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
-        action.fulfill()
+        checkUnlockedAndFulfill(action: action, counter: 0, isLockScreen: false)
     }
     
+    private func checkUnlockedAndFulfill(action: CXAnswerCallAction, counter: Int, isLockScreen: Bool) {
+        if UIApplication.shared.isProtectedDataAvailable {
+            guard let call = self.callManager?.callWithUUID(uuid: action.callUUID) else{
+                action.fail()
+                return
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1200)) {
+                self.configurAudioSession()
+            }
+            self.answerCall = call
+            sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
+            if(isLockScreen) {
+                sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_LOCKSCREEN, self.data?.toJSON())
+            }
+            action.fulfill()
+        }
+        else {
+            if counter > 180 {
+                action.fail()
+            } else {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    self.checkUnlockedAndFulfill(action: action, counter: counter + 1, isLockScreen: true)
+                }
+            }
+        }
+    }
 
     public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         guard let call = self.callManager?.callWithUUID(uuid: action.callUUID) else {
