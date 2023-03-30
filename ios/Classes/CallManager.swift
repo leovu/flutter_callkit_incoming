@@ -71,7 +71,10 @@ class CallManager: NSObject {
                 }
                 json.append(item)
             }else {
-                var item: [String: String] = ["id": call.uuid.uuidString]
+                var item: [String: Any?] = ["id": call.uuid.uuidString]
+                if call.hasConnected {
+                    item["isAccepted"] = call.hasConnected
+                }
                 json.append(item)
             }
         }
