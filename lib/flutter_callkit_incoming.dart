@@ -89,7 +89,7 @@ class FlutterCallkitIncoming {
 
   /// On device Xiaomi
   /// Need to check 'Show on lock screen' permission
-  static Future<bool> checkShowOnLockScreen() async {
+  static Future<bool?> checkShowOnLockScreen() async {
     return await _channel.invokeMethod("checkShowOnLockScreen");
   }
 
