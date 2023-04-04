@@ -251,8 +251,11 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                 "openShowOnLockScreen" -> {
                     if (Build.MANUFACTURER.equals("Xiaomi",true)) {
                         val intent = Intent("miui.intent.action.APP_PERM_EDITOR")
-                        intent.setClassName("com.miui.securitycenter", "com.miui.permcenter.permissions.PermissionsEditorActivity")
+                        intent.setClassName(
+                            "com.miui.securitycenter",
+                            "com.miui.permcenter.permissions.PermissionsEditorActivity")
                         intent.putExtra("extra_pkgname", context?.packageName)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         context?.startActivity(intent)
                     }
                     result.success("")
