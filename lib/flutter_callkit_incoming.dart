@@ -87,6 +87,12 @@ class FlutterCallkitIncoming {
     return await _channel.invokeMethod("clearCall");
   }
 
+  /// On device Xiaomi
+  /// Need to check 'Show on lock screen' permission
+  static Future<bool> checkShowOnLockScreen() async {
+    return await _channel.invokeMethod("checkShowOnLockScreen");
+  }
+
   static CallEvent? _receiveCallEvent(dynamic data) {
     Event? event;
     Map<String, dynamic> body = {};
