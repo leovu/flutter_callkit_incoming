@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.AppOpsManager
 import android.content.Context
 import android.content.Context.APP_OPS_SERVICE
+import android.content.Intent
 import android.os.Binder
 import android.os.Build
 import android.os.Handler
@@ -246,6 +247,15 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                 }
                 "checkShowOnLockScreen" -> {
                     result.success(isShowOnLockScreenPermissionEnable())
+                }
+                "openShowOnLockScreen" -> {
+                    if (Build.MANUFACTURER.equals("Xiaomi",true)) {
+                        val intent = Intent("miui.intent.action.APP_PERM_EDITOR")
+                        intent.setClassName("com.miui.securitycenter", "com.miui.permcenter.permissions.PermissionsEditorActivity")
+                        intent.putExtra("extra_pkgname", context?.packageName)
+                        context?.startActivity(intent)
+                    }
+                    result.success("")
                 }
             }
         } catch (error: Exception) {
