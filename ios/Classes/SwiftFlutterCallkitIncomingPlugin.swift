@@ -379,30 +379,20 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     
     private func checkUnlockedAndFulfill(action: CXAnswerCallAction, counter: Int, isLockScreen: Bool) {
         let state = UIApplication.shared.applicationState
-        if state == .active {
-            guard let call = self.callManager?.callWithUUID(uuid: action.callUUID) else{
-                action.fail()
-                return
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1200)) {
-                self.configurAudioSession()
-            }
-            self.answerCall = call
-            sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
-            action.fulfill()
+        guard let call = self.callManager?.callWithUUID(uuid: action.callUUID) else{
+            action.fail()
+            return
         }
-        else {
-            guard let call = self.callManager?.callWithUUID(uuid: action.callUUID) else{
-                action.fail()
-                return
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1200)) {
-                self.configurAudioSession()
-            }
-            self.answerCall = call
-            sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
-            action.fulfill()
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1200)) {
+            self.configurAudioSession()
         }
+        self.answerCall = call
+        var json:[String: Any?]? = self.data?.toJSON()
+        if UIApplication.shared.isProtectedDataAvailable && state == .inactive {
+            json?["isLockScreen"] = isLockScreen
+        }
+        sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, json)
+        action.fulfill()
     }
 
     public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
