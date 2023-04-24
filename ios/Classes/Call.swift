@@ -128,6 +128,8 @@ public class Call: NSObject {
     @objc public var type: Int
     @objc public var duration: Int
     @objc public var extra: NSDictionary
+    @objc public var callerId: Int
+    @objc public var receiverId: Int
     
     //iOS
     @objc public var iconName: String
@@ -146,8 +148,10 @@ public class Call: NSObject {
     @objc public var audioSessionPreferredSampleRate: Double
     @objc public var audioSessionPreferredIOBufferDuration: Double
     
-    @objc public init(id: String, nameCaller: String, handle: String, type: Int) {
+    @objc public init(id: String, nameCaller: String, handle: String, type: Int, callerId: Int, receiverId: Int) {
         self.uuid = id
+        self.callerId = callerId
+        self.receiverId = receiverId
         self.nameCaller = nameCaller
         self.appName = "Callkit"
         self.handle = handle
@@ -182,6 +186,8 @@ public class Call: NSObject {
     
     public init(args: [String: Any?]) {
         self.uuid = args["id"] as? String ?? ""
+        self.callerId = args["callerId"] as? Int ?? 0
+        self.receiverId = args["receiverId"] as? Int ?? 0
         self.nameCaller = args["nameCaller"] as? String ?? ""
         self.appName = args["appName"] as? String ?? "Callkit"
         self.handle = args["handle"] as? String ?? ""
@@ -246,6 +252,8 @@ public class Call: NSObject {
         ] as [String : Any?]
         let map = [
             "uuid": uuid,
+            "receiverId": receiverId,
+            "callerId": callerId,
             "id": uuid,
             "nameCaller": nameCaller,
             "appName": appName,

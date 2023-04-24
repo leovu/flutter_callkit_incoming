@@ -378,7 +378,8 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
     }
     
     private func checkUnlockedAndFulfill(action: CXAnswerCallAction, counter: Int, isLockScreen: Bool) {
-        if UIApplication.shared.isProtectedDataAvailable {
+        let state = UIApplication.shared.applicationState
+        if state == .active {
             guard let call = self.callManager?.callWithUUID(uuid: action.callUUID) else{
                 action.fail()
                 return
@@ -387,19 +388,20 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
                 self.configurAudioSession()
             }
             self.answerCall = call
-            var json:[String: Any?]? = self.data?.toJSON()
-            json?["isLockScreen"] = isLockScreen
             sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
             action.fulfill()
         }
         else {
-            if counter > 180 {
+            guard let call = self.callManager?.callWithUUID(uuid: action.callUUID) else{
                 action.fail()
-            } else {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    self.checkUnlockedAndFulfill(action: action, counter: counter + 1, isLockScreen: true)
-                }
+                return
             }
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1200)) {
+                self.configurAudioSession()
+            }
+            self.answerCall = call
+            sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, self.data?.toJSON())
+            action.fulfill()
         }
     }
 
