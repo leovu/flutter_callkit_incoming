@@ -388,7 +388,7 @@ public class SwiftFlutterCallkitIncomingPlugin: NSObject, FlutterPlugin, CXProvi
         }
         self.answerCall = call
         var json:[String: Any?]? = self.data?.toJSON()
-        if UIApplication.shared.isProtectedDataAvailable && state == .inactive {
+        if UIApplication.shared.isProtectedDataAvailable == false && state == .inactive {
             json?["isLockScreen"] = isLockScreen
         }
         sendEvent(SwiftFlutterCallkitIncomingPlugin.ACTION_CALL_ACCEPT, json)
