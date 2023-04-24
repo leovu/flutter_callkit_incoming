@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 
@@ -85,6 +86,22 @@ class FlutterCallkitIncoming {
   /// Clear all call and notification call
   static Future clearCall() async {
     return await _channel.invokeMethod("clearCall");
+  }
+
+  /// On device Xiaomi
+  /// Need to check 'Show on lock screen' permission
+  static Future<bool?> checkShowOnLockScreen() async {
+    if(Platform.isAndroid){
+      return await _channel.invokeMethod("checkShowOnLockScreen");
+    }
+    return null;
+  }
+
+  /// Show setting 'Show on lock screen' permission
+  static openShowOnLockScreen() async {
+    if(Platform.isAndroid){
+      _channel.invokeMethod("openShowOnLockScreen");
+    }
   }
 
   static CallEvent? _receiveCallEvent(dynamic data) {

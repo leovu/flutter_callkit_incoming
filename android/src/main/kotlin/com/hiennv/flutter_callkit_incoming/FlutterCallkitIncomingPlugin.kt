@@ -2,7 +2,12 @@ package com.hiennv.flutter_callkit_incoming
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AppOpsManager
 import android.content.Context
+import android.content.Context.APP_OPS_SERVICE
+import android.content.Intent
+import android.os.Binder
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.NonNull
@@ -17,6 +22,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import java.lang.reflect.Method
 
 /** FlutterCallkitIncomingPlugin */
 class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -137,6 +143,26 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
         eventHandler.send(event, body)
     }
 
+    private fun isShowOnLockScreenPermissionEnable(): Boolean? {
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                val manager = context?.getSystemService(APP_OPS_SERVICE) as AppOpsManager
+                val method: Method = AppOpsManager::class.java.getDeclaredMethod(
+                    "checkOpNoThrow",
+                    Int::class.javaPrimitiveType,
+                    Int::class.javaPrimitiveType,
+                    String::class.java
+                )
+                val result = method.invoke(manager, 10020, Binder.getCallingUid(), context?.packageName) as Int
+                AppOpsManager.MODE_ALLOWED == result
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         try {
             when (call.method) {
@@ -218,6 +244,21 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                     }
                     removeAllCalls(context)
                     result.success("OK")
+                }
+                "checkShowOnLockScreen" -> {
+                    result.success(isShowOnLockScreenPermissionEnable())
+                }
+                "openShowOnLockScreen" -> {
+                    if (Build.MANUFACTURER.equals("Xiaomi",true)) {
+                        val intent = Intent("miui.intent.action.APP_PERM_EDITOR")
+                        intent.setClassName(
+                            "com.miui.securitycenter",
+                            "com.miui.permcenter.permissions.PermissionsEditorActivity")
+                        intent.putExtra("extra_pkgname", context?.packageName)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        context?.startActivity(intent)
+                    }
+                    result.success("")
                 }
             }
         } catch (error: Exception) {
