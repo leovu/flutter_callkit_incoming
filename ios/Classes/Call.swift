@@ -130,6 +130,7 @@ public class Call: NSObject {
     @objc public var extra: NSDictionary
     @objc public var callerId: Int
     @objc public var receiverId: Int
+    @objc public var isLockScreen: Bool
     
     //iOS
     @objc public var iconName: String
@@ -153,6 +154,7 @@ public class Call: NSObject {
         self.callerId = callerId
         self.receiverId = receiverId
         self.nameCaller = nameCaller
+        self.isLockScreen = false
         self.appName = "Callkit"
         self.handle = handle
         self.avatar = ""
@@ -189,6 +191,7 @@ public class Call: NSObject {
         self.callerId = args["callerId"] as? Int ?? 0
         self.receiverId = args["receiverId"] as? Int ?? 0
         self.nameCaller = args["nameCaller"] as? String ?? ""
+        self.isLockScreen = false
         self.appName = args["appName"] as? String ?? "Callkit"
         self.handle = args["handle"] as? String ?? ""
         self.avatar = args["avatar"] as? String ?? ""
@@ -262,7 +265,8 @@ public class Call: NSObject {
             "type": type,
             "duration": duration,
             "extra": extra,
-            "ios": ios
+            "ios": ios,
+            "isLockScreen" : isLockScreen
         ] as [String : Any?]
         return map
     }
